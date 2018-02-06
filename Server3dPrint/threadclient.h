@@ -9,7 +9,7 @@ class ThreadClient : public QThread
 {
     Q_OBJECT
 public:
-    QThreadClient(qintptr socketID, QObject *parent);
+    ThreadClient(qintptr socketID, QObject *parent);
     void run() override;
 private:
     QTcpSocket *tcpSocket;
