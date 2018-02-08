@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <QTcpSocket>
+#include <QDataStream>
 
 class ThreadClient : public QThread
 {
@@ -14,9 +15,10 @@ public:
 private:
     QTcpSocket *tcpSocket;
     qintptr socketDescriptor;
+    int blockSize{0};
 public slots:
     void readyRead();
-    void write(QByteArray data);
+    bool write(QByteArray data);
     void disconnected();
 signals:
     void error(QTcpSocket::SocketError socketError);

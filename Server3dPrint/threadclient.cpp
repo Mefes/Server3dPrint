@@ -14,7 +14,7 @@ void ThreadClient::run()
         return;
         }
     connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(readyRead()),Qt::DirectConnection);
-    connect(tcpSocket,SIGNAL(disconnected()),this,SLOT(disconnected()));
+    connect(tcpSocket,SIGNAL(disconnected()),this,SLOT(deleteLater()));
     exec();
 
 }
@@ -23,7 +23,7 @@ void ThreadClient::readyRead()
 {
     QDataStream in(tcpSocket);
     in.setVersion(QDataStream::Qt_5_5);
-    if (blockSize == 0)
+    if (!blockSize)
     {
         // data to read available
         if (tcpSocket->bytesAvailable()<(int)sizeof(quint16))
@@ -47,7 +47,7 @@ void ThreadClient::readyRead()
 
 bool ThreadClient::write(QByteArray data)
 {
-    QDataStream out(&block, QIODevice::WriteOnly);
+    QDataStream out(&data, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_5);
         out << (quint64)0; // Space for size of data
         out << data; // Actual data
@@ -57,8 +57,3 @@ bool ThreadClient::write(QByteArray data)
     return tcpSocket->waitForBytesWritten(-1);
 }
 
-void ThreadClient::disconnected()
-{
-    tcpSocket->deleteLater();
-    exit(0);
-}
