@@ -19,41 +19,56 @@ void ThreadClient::run()
 
 }
 
+QByteArray ThreadClient::compressData(const QVariant &var)
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+    stream << var;
+    return qCompress(data, 9);
+}
+
+QVariant ThreadClient::uncompressData(const QByteArray &data)
+{
+    QByteArray raw_data = qUncompress(data);
+    if(raw_data.isEmpty()) return QVariant();
+    QDataStream stream(raw_data);
+    stream.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+    QVariant var;
+    stream >> var;
+    return var;
+}
+
 void ThreadClient::readyRead()
 {
     QDataStream in(tcpSocket);
-    in.setVersion(QDataStream::Qt_5_5);
-    if (!blockSize)
-    {
-        // data to read available
-        if (tcpSocket->bytesAvailable()<(int)sizeof(quint16))
-        {
-            return;
-        }
-        in >> blockSize;
-    }
-    if (tcpSocket->bytesAvailable() < blockSize)
-    {
-        return;
-    }
-    QByteArray data,nextByte;
-    // read ...
-    in >> nextByte;
-    data = nextByte;
-    emit read(data);
-    data.clear();
-    nextByte.clear();
+     in.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+
+     while(tcpSocket->bytesAvailable()) {
+         in.startTransaction();
+
+         QByteArray byteData;
+         in >> byteData;
+         if(in.commitTransaction() == false) return;
+
+         QVariant var = uncompressData(byteData);
+
+         if(var.isValid() && var.canConvert<Data>()) {
+             Data data = var.value<Data>();
+         }
+     }
+
+//    emit read(data,typeData);
+
 }
 
-bool ThreadClient::write(QByteArray data)
+bool ThreadClient::write(const QVariant &var)
 {
-    QDataStream out(&data, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_5);
-        out << (quint64)0; // Space for size of data
-        out << data; // Actual data
-        out.device()->seek(0);
-        out << (quint64)(data.size() - sizeof(quint64));
-    tcpSocket->write(data);
+    QByteArray byteData;
+    QDataStream out(&byteData, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_DefaultCompiledVersion);
+    out << compressData(var);
+    tcpSocket->write(byteData);
     return tcpSocket->waitForBytesWritten(-1);
 }
 

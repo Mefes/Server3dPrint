@@ -27,12 +27,16 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         threadclient.cpp \
-        server.cpp
+        server.cpp \
+    cncdb.cpp \
+    data.cpp
 
 HEADERS += \
         mainwindow.h \
         threadclient.h \
-        server.h
+        server.h \
+    cncdb.h \
+    data.h
 
 FORMS += \
         mainwindow.ui

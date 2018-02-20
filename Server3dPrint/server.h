@@ -8,19 +8,19 @@ class Server: public QTcpServer
 {
     Q_OBJECT
 public:
-    Server(int port, QObject *parent);
+    Server(int port, QObject *parent = nullptr);
     ~Server();
 private:
-    QHash <int,QThreadClient *> clientsMachine;
+    QHash <int,ThreadClient *> clientsMachine;
 public slots:
-    bool writeToSocket();
+    bool writeToSocket(QByteArray data, short type);
+    bool readFromSocket(QByteArray data, short type);
 signals:
-    bool write(QByteArray data);
+    bool write(QByteArray data,short type);
     void updateCNCList(QHash <int,ThreadClient *> clientsMachine);
 
 protected:
     void incomingConnection(qintptr socketDescriptor) override;
-    bool readFromSocket(QByteArray data);
 
 };
 
