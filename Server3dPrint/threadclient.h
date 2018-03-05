@@ -5,7 +5,9 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QDataStream>
-#include "data.h"
+#include <QCoreApplication>
+#include <QFile>
+//#include "data.h"
 class ThreadClient : public QThread
 {
     Q_OBJECT
@@ -15,15 +17,13 @@ public:
 private:
     QTcpSocket *tcpSocket;
     qintptr socketDescriptor;
-    int blockSize{0};
-    QByteArray compressData(const QVariant &var);
-    QVariant uncompressData(const QByteArray &data);
 public slots:
     void readyRead();
-    bool write(const QVariant &var);
+    bool write(const QString &msg);
+    void write(QFile &file);
 signals:
     void error(QTcpSocket::SocketError socketError);
-    void read(QByteArray data,short typeData);
+//    void read(Data data,qintptr socketID);
 
 };
 

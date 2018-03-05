@@ -1,6 +1,7 @@
 #ifndef CNCDB_H
 #define CNCDB_H
 
+#include <QtSql>
 #include <QObject>
 
 class CNCDB : public QObject
@@ -12,6 +13,8 @@ public:
 signals:
 
 public slots:
+    QString execQuery(QString str);
+
 };
 
 #endif // CNCDB_H
