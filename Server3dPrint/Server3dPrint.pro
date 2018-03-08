@@ -28,13 +28,15 @@ SOURCES += \
         mainwindow.cpp \
         threadclient.cpp \
         server.cpp \
-    cncdb.cpp
+    cncdb.cpp \
+    gcodeeditor.cpp
 
 HEADERS += \
         mainwindow.h \
         threadclient.h \
         server.h \
-    cncdb.h
+    cncdb.h \
+    gcodeeditor.h
 
 FORMS += \
         mainwindow.ui

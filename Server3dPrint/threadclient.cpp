@@ -16,7 +16,6 @@ void ThreadClient::run()
     connect(tcpSocket,SIGNAL(readyRead()),this,SLOT(readyRead()),Qt::DirectConnection);
     connect(tcpSocket,SIGNAL(disconnected()),this,SLOT(deleteLater()));
     exec();
-
 }
 
 
@@ -51,40 +50,35 @@ bool ThreadClient::write(const QString &msg)
 
 void ThreadClient::write( QFile &file)
 {
-//    if (!file.open(QIODevice::ReadOnly))
-//    {
-//        qDebug() << "Error open file ";
-//        return;
-//    }
     const qint64 chunkSize = 1024 * 64;
     qDebug() << "Send big file...";
-    short typeData =0;
+    short typeData = 0;
     int pos = 0;
     qint64 fileSize = file.size();
     qDebug() << "Start sending file:" << file.fileName() << "[" << fileSize << "]";
-    //    QDataStream out;
-    QByteArray data;
-    QDataStream out(&data, QIODevice::WriteOnly);
+    QDataStream out(tcpSocket);
+//    QByteArray data;
+//    QDataStream out(&data, QIODevice::WriteOnly);
     out.setVersion( QDataStream::Qt_DefaultCompiledVersion );
     out << typeData;
     out << fileSize;
     qDebug() << "Filesize :" << fileSize;
-    if( tcpSocket->write( (const char*)&fileSize, sizeof( fileSize ) ) != sizeof( fileSize ) )
+    if( tcpSocket->write((const char*)&fileSize, sizeof(fileSize)) != sizeof(fileSize))
     {
         qDebug() << "Error write filesize";
         return;
     }
-    while( pos < fileSize )
+    while(pos < fileSize)
     {
-        int blockSize = qMin( chunkSize, fileSize - pos );
-        QByteArray buf= file.read( blockSize );
-        if( buf.size() != blockSize )
+        int blockSize = qMin(chunkSize, fileSize - pos);
+        QByteArray buf= file.read(blockSize);
+        if(buf.size() != blockSize)
         {
             qDebug() << "Error read file.";
             return;
         }
-        int writed = tcpSocket->write( buf );
-        if( writed == -1 )
+        int writed = tcpSocket->write(buf);
+        if(writed == -1)
         {
             qDebug() << "Error write data";
             return;

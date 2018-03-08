@@ -32,8 +32,7 @@ bool Server::readFromSocket(QVariant data, qintptr socketDescriptor)
 
 bool Server::writeToSocket(QFile &file, qintptr socketDescriptor)
 {
-
-
+clientsMachine[socketDescriptor]->write(file);
 }
 
 bool Server::writeToSocket(QString msg, qintptr socketDescriptor)
